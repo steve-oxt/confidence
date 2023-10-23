@@ -1,0 +1,18 @@
+[package]
+name = "oxt-confidence"
+version = "0.2.0"
+authors = ["stephen-cameron <stephen@oxt.ca>"]
+edition = "2021"
+description = "Calculate the confidence of a number a certain amount of sequences away"
+license = "MIT"
+
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+chrono = "0.4.31"
+rand = "0.8.5"
+
+[lib]
+name = "oxt_confidence"
+path = "src/confidence.rs"
