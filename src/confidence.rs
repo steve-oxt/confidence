@@ -12,6 +12,7 @@ pub struct Confidence {
     tests: i32,
     positive: Vec<i32>,
     percentage: Vec<f64>,
+    pretty_percentage: Vec<String>,
     pub results: String,
 }
 
