@@ -58,6 +58,7 @@ impl Confidence {
             tests: ((et as f64 - t as f64) / seconds * ticks) as i32,
             positive: [0, 0, 0, 0, 0, 0, 0].to_vec(),
             percentage: [0.01, 0.025, 0.05, 0.10, 1.00, 2.00, 4.00].to_vec(),
+            pretty_percentage: ["one_percent", "two_percent", "five_percent", "ten_percent", "one_hundred_percent", "two_hundred_percent", "four_hundred_percent"].to_vec(),
             results: format!("{{\"time\":{}", time),
         }
     }
@@ -92,9 +93,9 @@ impl Confidence {
         for w in 0..7 {
             let success: f64 = (self.positive[w] as f64) / 1000.00 * 100.00;
             self.results +=
-                format!(",\"{}%\":{:.2}", (self.percentage[w] * 100.00), success).as_str();
+                format!(",\"{}\":{:.2}", self.pretty_percentage[w], success).as_str();
         }
 
-        self.results += format!(",\"Current Price\":{:.2}}}", self.end).as_str();
+        self.results += format!(",\"current_price\":{:.2}}}", self.end).as_str();
     }
 }
