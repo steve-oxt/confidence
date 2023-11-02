@@ -59,7 +59,7 @@ impl Confidence {
             tests: ((et as f64 - t as f64) / seconds * ticks) as i32,
             positive: [0, 0, 0, 0, 0, 0, 0].to_vec(),
             percentage: [0.01, 0.025, 0.05, 0.10, 1.00, 2.00, 4.00].to_vec(),
-            pretty_percentage: ["one_percent", "two_percent", "five_percent", "ten_percent", "one_hundred_percent", "two_hundred_percent", "four_hundred_percent"].to_vec(),
+            pretty_percentage: [String::from("one_percent"), String::from("two_percent"), String::from("five_percent"), String::from("ten_percent"), String::from("one_hundred_percent"), String::from("two_hundred_percent"), String::from("four_hundred_percent")].to_vec(),
             results: format!("{{\"time\":{}", time),
         }
     }
