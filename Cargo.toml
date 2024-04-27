@@ -1,6 +1,6 @@
 [package]
 name = "oxt-confidence"
-version = "0.2.1"
+version = "0.2.2"
 authors = ["stephen-cameron <git@oxt.ca>"]
 edition = "2021"
 description = "Calculate the confidence of a number a certain amount of sequences away"
@@ -12,6 +12,8 @@ license = "MIT"
 [dependencies]
 chrono = "0.4.31"
 rand = "0.8.5"
+serde = { version = "1.0.199", features = ["derive"]}
+
 
 [lib]
 name = "oxt_confidence"
