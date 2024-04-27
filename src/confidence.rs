@@ -1,4 +1,8 @@
-use chrono::{Datelike, Local, NaiveDate, NaiveDateTime};
+pub mod results;
+pub mod percent;
+use results::Results;
+use percent::Percent;
+use chrono::{Datelike, Local, NaiveDate, DateTime};
 use rand::random;
 use std::mem::swap;
 
@@ -7,13 +11,11 @@ pub struct Confidence {
     start: f64,
     previous: f64,
     current: f64,
-    end: f64,
+    // end: f64,
     interval: f64,
     tests: i32,
-    positive: Vec<i32>,
-    percentage: Vec<f64>,
-    pretty_percentage: Vec<String>,
-    pub results: String,
+    percents: Vec<Percent>,
+    pub results: Results,
 }
 
 impl Confidence {
@@ -30,19 +32,20 @@ impl Confidence {
         let et: i64 = {
             if end_time == 0 {
                 NaiveDate::from_ymd_opt(
-                    NaiveDateTime::from_timestamp_opt(t, 0)
+                    DateTime::from_timestamp(t, 0)
                         .unwrap()
                         .year(),
-                    NaiveDateTime::from_timestamp_opt(t, 0)
+                    DateTime::from_timestamp(t, 0)
                         .unwrap()
                         .month(),
-                    NaiveDateTime::from_timestamp_opt(t, 0)
+                    DateTime::from_timestamp(t, 0)
                         .unwrap()
                         .day(),
                 )
                 .unwrap()
                 .and_hms_opt(20, 00, 00)
                 .unwrap()
+                .and_utc()
                 .timestamp()
             } else {
                 end_time
@@ -55,12 +58,10 @@ impl Confidence {
             previous: previous,
             current: start,
             interval: interval,
-            end: end,
+            //end: end,
             tests: ((et as f64 - t as f64) / seconds * ticks) as i32,
-            positive: [0, 0, 0, 0, 0, 0, 0].to_vec(),
-            percentage: [0.01, 0.025, 0.05, 0.10, 1.00, 2.00, 4.00].to_vec(),
-            pretty_percentage: [String::from("one_percent"), String::from("two_percent"), String::from("five_percent"), String::from("ten_percent"), String::from("one_hundred_percent"), String::from("two_hundred_percent"), String::from("four_hundred_percent")].to_vec(),
-            results: format!("{{\"time\":{}", time),
+            percents: default_percents(1000),
+            results: Results::new(time, end),
         }
     }
 
@@ -83,20 +84,28 @@ impl Confidence {
                 }
             }
             let change = ((self.current - self.start).abs()) / self.start;
-            for z in 0..7 {
-                if change > self.percentage[z] {
-                    self.positive[z] += 1;
+            for percent in 0..self.percents.len() {
+                if change > self.percents[percent].value {
+                    self.percents[percent].update();
                 }
             }
             self.current = self.start;
             self.previous = self.start - self.interval;
         }
-        for w in 0..7 {
-            let success: f64 = (self.positive[w] as f64) / 1000.00 * 100.00;
-            self.results +=
-                format!(",\"{}\":{:.2}", self.pretty_percentage[w], success).as_str();
-        }
-
-        self.results += format!(",\"current_price\":{:.2}}}", self.end).as_str();
+        self.results.percents = self.percents.clone();
     }
+
+    
+}
+
+fn default_percents(tests: i64) -> Vec<Percent> {
+    let mut deafults: Vec<Percent> = Vec::new();
+    deafults.push(Percent::new(String::from("one_percent"), 0.01, tests));
+    deafults.push(Percent::new(String::from("two_percent"), 0.025, tests));
+    deafults.push(Percent::new(String::from("five_percent"), 0.05, tests));
+    deafults.push(Percent::new(String::from("ten_percent"), 0.10, tests));
+    deafults.push(Percent::new(String::from("one_hundred_percent"), 1.00, tests));
+    deafults.push(Percent::new(String::from("two_hundred_percent"), 2.00, tests));
+    deafults.push(Percent::new(String::from("four_hundred_percent"), 4.00, tests));
+    deafults
 }
