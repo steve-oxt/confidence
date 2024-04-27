@@ -16,12 +16,12 @@ impl Percent{
             value: value,
             tests: tests,
             count: 0,
-            success: (value * 0 as f64) / tests as f64,
+            success: 0.00,
         }
     }
 
     pub fn update(&mut self){
         self.count += 1;
-        self.success = (self.value * self.count as f64) / self.tests as f64;
+        self.success = (self.count as f64 / self.tests as f64) * 100.00;
     }
 }
