@@ -1,4 +1,5 @@
 use serde::{Serialize, Deserialize};
+use std::fmt;
 
 #[derive(Clone, Serialize, Deserialize)]
 pub struct Percent{
@@ -7,6 +8,16 @@ pub struct Percent{
     tests: i64,
     count: i64,
     pub success: f64,
+}
+
+impl fmt::Debug for Percent {
+    fn fmt(&self, fmt: &mut fmt::Formatter<'_>) -> fmt::Result {
+        fmt.debug_struct("Percent")
+            .field("name", &self.name)
+            .field("value", &self.value)
+            .field("success", &self.success)
+            .finish()
+    }
 }
 
 impl Percent{
