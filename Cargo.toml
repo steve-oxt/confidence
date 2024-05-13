@@ -1,6 +1,6 @@
 [package]
 name = "oxt-confidence"
-version = "0.2.4"
+version = "0.2.5"
 authors = ["stephen-cameron <git@oxt.ca>"]
 edition = "2021"
 description = "Calculate the confidence of a number a certain amount of sequences away"

@@ -59,7 +59,8 @@ impl Confidence {
             current: start,
             interval: interval,
             //end: end,
-            tests: ((et as f64 - t as f64) / seconds * ticks) as i32,
+            tests: (3600.00 / seconds * ticks) as i32,
+            //tests: ((et as f64 - t as f64) / seconds * ticks) as i32,
             percents: default_percents(1000),
             results: Results::new(time, end),
         }
