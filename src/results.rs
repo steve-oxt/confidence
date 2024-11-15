@@ -1,5 +1,5 @@
-use serde::{Serialize, Deserialize};
 use crate::percent::Percent;
+use serde::{Deserialize, Serialize};
 
 #[derive(Clone, Serialize, Deserialize)]
 pub struct Results {
@@ -10,7 +10,7 @@ pub struct Results {
 
 impl Results {
     pub fn new(time: i64, price: f64) -> Results {
-        Results {   
+        Results {
             time: time,
             percents: Vec::new(),
             price: price,
@@ -24,7 +24,7 @@ impl Results {
         }
         self.price = price;
     }
-}   
+}
 
 #[cfg(test)]
 mod tests {
@@ -62,4 +62,3 @@ mod tests {
         }
     }
 }
-
