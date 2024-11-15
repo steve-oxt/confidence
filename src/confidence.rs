@@ -1,9 +1,9 @@
-pub mod results;
 pub mod percent;
-use results::Results;
+pub mod results;
+use chrono::{DateTime, Datelike, Local, NaiveDate};
 use percent::Percent;
-use chrono::{Datelike, Local, NaiveDate, DateTime};
 use rand::random;
+use results::Results;
 use std::mem::swap;
 
 pub struct Confidence {
@@ -19,7 +19,18 @@ pub struct Confidence {
 }
 
 impl Confidence {
-    pub fn new(ticks: f64, seconds: f64, time: i64, end_time: i64, rate: f64, start: f64, previous: f64, interval: f64, end: f64, hour_test: bool) -> Confidence {
+    pub fn new(
+        ticks: f64,
+        seconds: f64,
+        time: i64,
+        end_time: i64,
+        rate: f64,
+        start: f64,
+        previous: f64,
+        interval: f64,
+        end: f64,
+        hour_test: bool,
+    ) -> Confidence {
         let ticks: f64 = ticks;
         let seconds: f64 = seconds;
         let t: i64 = {
@@ -32,15 +43,9 @@ impl Confidence {
         let et: i64 = {
             if end_time == 0 {
                 NaiveDate::from_ymd_opt(
-                    DateTime::from_timestamp(t, 0)
-                        .unwrap()
-                        .year(),
-                    DateTime::from_timestamp(t, 0)
-                        .unwrap()
-                        .month(),
-                    DateTime::from_timestamp(t, 0)
-                        .unwrap()
-                        .day(),
+                    DateTime::from_timestamp(t, 0).unwrap().year(),
+                    DateTime::from_timestamp(t, 0).unwrap().month(),
+                    DateTime::from_timestamp(t, 0).unwrap().day(),
                 )
                 .unwrap()
                 .and_hms_opt(20, 00, 00)
@@ -53,7 +58,7 @@ impl Confidence {
         };
         let tests = if hour_test {
             (3600.00 / seconds * ticks) as i32
-        }else {
+        } else {
             ((et as f64 - t as f64) / seconds * ticks) as i32
         };
 
@@ -102,8 +107,6 @@ impl Confidence {
         }
         self.results.percents = self.percents.clone();
     }
-
-    
 }
 
 fn default_percents(tests: i64) -> Vec<Percent> {
@@ -112,9 +115,21 @@ fn default_percents(tests: i64) -> Vec<Percent> {
     deafults.push(Percent::new(String::from("two_percent"), 0.025, tests));
     deafults.push(Percent::new(String::from("five_percent"), 0.05, tests));
     deafults.push(Percent::new(String::from("ten_percent"), 0.10, tests));
-    deafults.push(Percent::new(String::from("one_hundred_percent"), 1.00, tests));
-    deafults.push(Percent::new(String::from("two_hundred_percent"), 2.00, tests));
-    deafults.push(Percent::new(String::from("four_hundred_percent"), 4.00, tests));
+    deafults.push(Percent::new(
+        String::from("one_hundred_percent"),
+        1.00,
+        tests,
+    ));
+    deafults.push(Percent::new(
+        String::from("two_hundred_percent"),
+        2.00,
+        tests,
+    ));
+    deafults.push(Percent::new(
+        String::from("four_hundred_percent"),
+        4.00,
+        tests,
+    ));
     deafults
 }
 
@@ -136,8 +151,9 @@ mod tests {
         let hour_test = false; // Test for the whole day, not just an hour
         let current_time = Local::now().timestamp();
 
-
-        let confidence = Confidence::new(ticks, seconds, time, end_time, rate, start, previous, interval, end, hour_test);
+        let confidence = Confidence::new(
+            ticks, seconds, time, end_time, rate, start, previous, interval, end, hour_test,
+        );
 
         assert_eq!(confidence.rate, rate);
         assert_eq!(confidence.start, start);
@@ -146,25 +162,21 @@ mod tests {
         assert_eq!(confidence.interval, interval);
 
         let calculated_tests = ((NaiveDate::from_ymd_opt(
-            DateTime::from_timestamp(current_time, 0)
-                .unwrap()
-                .year(),
-            DateTime::from_timestamp(current_time, 0)
-                .unwrap()
-                .month(),
-            DateTime::from_timestamp(current_time, 0)
-                .unwrap()
-                .day(),
+            DateTime::from_timestamp(current_time, 0).unwrap().year(),
+            DateTime::from_timestamp(current_time, 0).unwrap().month(),
+            DateTime::from_timestamp(current_time, 0).unwrap().day(),
         )
         .unwrap()
         .and_hms_opt(20, 00, 00)
         .unwrap()
         .and_utc()
-        .timestamp() as f64 - current_time as f64) / seconds * ticks) as i32;
-        
+        .timestamp() as f64
+            - current_time as f64)
+            / seconds
+            * ticks) as i32;
+
         assert_eq!(confidence.tests, calculated_tests);
     }
-
 
     #[test]
     fn test_confidence_new_hour_test() {
@@ -177,21 +189,21 @@ mod tests {
         let previous = 90.0;
         let interval = 10.0;
         let end = 200.0;
-        let hour_test = true; 
+        let hour_test = true;
 
-        let confidence = Confidence::new(ticks, seconds, time, end_time, rate, start, previous, interval, end, hour_test);
+        let confidence = Confidence::new(
+            ticks, seconds, time, end_time, rate, start, previous, interval, end, hour_test,
+        );
 
         assert_eq!(confidence.tests, (3600.0 / seconds * ticks) as i32);
     }
-
-
 
     #[test]
     fn test_confidence_calculate() {
         let ticks = 1.0;
         let seconds = 1.0;
         let time = 0;
-        let end_time = 0; 
+        let end_time = 0;
         let rate = 1.0; // Always succeed in the random test
         let start = 100.0;
         let previous = 90.0;
@@ -199,10 +211,11 @@ mod tests {
         let end = 0.0;
         let hour_test = true;
 
-        let mut confidence = Confidence::new(ticks, seconds, time, end_time, rate, start, previous, interval, end, hour_test);
+        let mut confidence = Confidence::new(
+            ticks, seconds, time, end_time, rate, start, previous, interval, end, hour_test,
+        );
         confidence.calculate();
 
-        
         assert!(confidence.results.percents[0].success >= 0.0); // one_percent
     }
 }
